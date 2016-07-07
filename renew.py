@@ -94,10 +94,10 @@ for domain in domains:
     LOGGER.info(stderr);
 
     if process.returncode != 0:
-      print("could not generate csr");
+      LOGGER.error("could not generate csr");
 
     if not os.path.isfile(csr_file):
-      print("csr not found and could not be created...")
+      LOGGER.error("csr not found and could not be created...")
       continue
 
   if os.path.isfile(crt_file):
@@ -105,7 +105,7 @@ for domain in domains:
     stdout,stderr = process.communicate()
       
     if process.returncode == 0:
-      print "EXPIRY:", domain, stdout.strip()
+      LOGGER.info("EXPIRY: %s %s" % (domain, stdout.strip()))
       renew_cert = 0
 
   if not renew_cert:
@@ -115,7 +115,7 @@ for domain in domains:
     crt_text = acme_tiny.get_crt(accountkey, csr_file, acmedir, log=LOGGER)
 
     if len(crt_text) <= 0:
-      print "certificate could not be retrieved :/"
+      LOGGER.error("certificate could not be retrieved :/")
       raise
   
     file_fd = open(crt_file, "w")
@@ -127,7 +127,7 @@ for domain in domains:
     intermediate_text = response.read()
 
     if len(intermediate_text) <= 0:
-      print "intermediate cert could not be retrieved :/"
+      LOGGER.error("intermediate cert could not be retrieved :/")
       raise
 
     file_fd = open(intermediate_file, "w")
@@ -143,6 +143,6 @@ for domain in domains:
   except:
    traceback.print_exc()
 
-  print "CERT FETCHED: ", domain
+  LOGGER.info("CERT FETCHED: %s" % ( domain ))
 if reload_services:
-  print "TODO: reload services"
+  LOGGER.info("TODO: reload services")
