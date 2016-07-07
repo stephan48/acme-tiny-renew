@@ -1,0 +1,9 @@
+[general]
+accountkey=./account.key
+challengedir=/var/web/challenges/
+intermediateurl=https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
+domains=domain1.tld domain2.tld
+opensslcfg=/etc/ssl/openssl.cnf
+
+[domain2.tld]
+san=subdomain1.domain2.tld domain3.tld
