@@ -144,5 +144,8 @@ for domain in domains:
    traceback.print_exc()
 
   LOGGER.info("CERT FETCHED: %s" % ( domain ))
+
+  reload_services = 1
+
 if reload_services:
   LOGGER.info("TODO: reload services")
