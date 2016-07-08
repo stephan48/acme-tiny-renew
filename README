@@ -1,0 +1,38 @@
+-- Configuration --
+The configuration is quite simple and consits of a single .ini file called renew.ini.
+This file has to be placed next to the script. In future versions we will allow a selection by parameter.
+
+The important keys are:
+[general] -> domains which holds a space seperated list of domains for which we want certificates.
+
+Additionally you can specify a section with the same name as one of the key in domains and add a san= key to automatically generate a certificate with multiply subjectaltnames.
+
+When the configuration is done you should make sure that the propper Aliases/Location blocks are defined in Nginx/Apache2 so the corresponding challenge response files will be found by the webservers. Refer to acme-tiny documentation for that.
+
+-- Generated File Structure --
+
+All files will be generated in the script directory if missing:
+
+domain.tld.key.pem - private key
+domain.tld.cfg.pem - openssl config
+domain.tld.csr.pem - cert request
+domain.tld.crt.pem - cert
+domain.tld.intermediate.pem - intermediate ca
+domain.tld.chained.pem - cert+intermediate
+
+-- Usage --
+Simply run the tool. It will automatically generate keys and requests if none are found.
+It will then hand the major work to acme-tiny and will just do some minor dump-to-file logic.
+
+On a successive run it will read the certificate expiry and only regenerate the cert if it will expire within the next 30 days.
+
+-- Installation --
+
+1. Make sure the openssl binary is in path
+2. git clone https://vcs.stejau.de/stephan/acme-tiny-renew
+3. git submodule update --recursive --init
+4 <-config edit->
+5. python renew.py
+6. ???
+7. PROFIT
+
