@@ -6,10 +6,7 @@ import sys
 import logging
 import traceback
 
-try:
-  from urllib.request import urlopen # Python 3
-except ImportError:
-  from urllib2 import urlopen # Python 2
+from urllib2 import urlopen # Python 2
 
 sys.path.append('./acme-tiny')
 
@@ -40,8 +37,8 @@ if not os.path.isdir(acmedir):
     os.mkdir(acmedir)
 
 if not os.path.isfile(accountkey):
-    print "no valid accountkey"
-    raise
+    LOGGER.error("no valid accountkey");
+    raise "no valid accountkey";
 
 for domain in domains:
   if not config.has_section(domain):
@@ -55,9 +52,10 @@ for domain in domains:
   chained_file = config.get(domain, 'file_chained', 0, {'domain': domain })
 
   sans = config.get(domain, 'san', 0, {'domain': domain }).split()
-  renew_cert = 1;
+  renew_cert = 1
+  failed = None
 
-  print "DOMAIN:", domain, csr_file, crt_file, intermediate_file, chained_file, key_file
+  LOGGER.info("DOMAIN: %s %s %s %s %s %s %s", domain, csr_file, crt_file, intermediate_file, chained_file, key_file, sans)
 
   if not os.path.isfile(csr_file):
     if not os.path.isfile(key_file):
@@ -77,7 +75,7 @@ for domain in domains:
     for san in sans:
       san_text_array.append("DNS:"+san);
 
-    LOGGER.info(san_text_array);
+    LOGGER.info("SANS: %s", san_text_array);
  
     file_fd = open(opensslcfg, "r")
     cfg_text = file_fd.read()
@@ -140,12 +138,18 @@ for domain in domains:
     file_fd.write(intermediate_text)
     file_fd.close()
 
+    failed = False
+
   except:
    traceback.print_exc()
+   failed = True
 
-  LOGGER.info("CERT FETCHED: %s" % ( domain ))
 
-  reload_services = 1
+  if not failed:
+   LOGGER.info("CERT FETCHED: %s" % ( domain ))
+   reload_services = 1
+  else:
+   LOGGER.info("CERT FETCH FAILED: %s" % (domain))
 
 if reload_services:
   LOGGER.info("TODO: reload services")
